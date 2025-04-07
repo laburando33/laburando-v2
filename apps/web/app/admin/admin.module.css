@@ -1,0 +1,30 @@
+.main {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: auto;
+  }
+  
+  .title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .loading,
+  .error {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  

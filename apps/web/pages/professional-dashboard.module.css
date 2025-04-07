@@ -1,0 +1,77 @@
+/* apps/web/pages/professional-dashboard.module.css */
+
+.dashboard {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: sans-serif;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+  }
+  
+  .statBox {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    flex: 1;
+    margin: 0 0.5rem;
+  }
+  
+  .statNumber {
+    font-size: 2rem;
+    font-weight: bold;
+    display: block;
+  }
+  
+  .statLabel {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+  }
+  
+  .yellowButton {
+    background-color: #fcb500;
+    border: none;
+    padding: 1rem 2rem;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .yellowButton:hover {
+    background-color: #e0a800;
+  }
+  
+  .requests {
+    margin-top: 2rem;
+  }
+  
+  .requestCard {
+    background-color: #eee;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  

@@ -1,0 +1,55 @@
+/* apps/web/components/Footer.module.css */
+body {
+    background: #f9f9f9;
+  }
+  
+  .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  .footerTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+  
+  .footerSubtitle {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 0.5rem;
+  }
+.footer {
+    background-color: black;
+    padding: 2rem 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #fff;
+    border-top: 1px solid #ddd;
+  }
+  
+  .container {
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+  
+  .links {
+    margin-top: 0.5rem;
+  }
+  
+  .link {
+    margin: 0 0.75rem;
+    color: #fcb500;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  

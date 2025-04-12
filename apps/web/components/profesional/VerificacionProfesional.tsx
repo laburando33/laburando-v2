@@ -12,7 +12,13 @@ interface Verificacion {
   estado: string;
 }
 
-export default function DashboardVerificacionProfesional({ userId }: { userId: string }) {
+interface Props {
+  userId: string;
+  isVerified?: boolean;
+  verificationStatus?: string;
+}
+
+export default function VerificacionProfesional({ userId, isVerified, verificationStatus }: Props) {
   const [verificacion, setVerificacion] = useState<Verificacion | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,33 +45,45 @@ export default function DashboardVerificacionProfesional({ userId }: { userId: s
     loadVerificacion();
   }, [userId]);
 
-  if (loading) return <p>Cargando verificación...</p>;
-  if (!verificacion) return <p>No has enviado ninguna verificación.</p>;
+  if (loading) return <p className={styles.loading}>Cargando verificación...</p>;
 
   return (
     <section className={styles.container}>
       <h2 className={styles.title}>🗂 Documentación de Verificación</h2>
-      <p className={styles.estado}><strong>Estado:</strong> {verificacion.estado.toUpperCase()}</p>
 
-      <div className={styles.docsGrid}>
-        <div>
-          <p><strong>DNI:</strong></p>
-          <img src={verificacion.dni_url} alt="DNI" className={styles.image} />
-        </div>
-        <div>
-          <p><strong>Certificado domicilio:</strong></p>
-          <img src={verificacion.certificado_url} alt="Certificado" className={styles.image} />
-        </div>
-      </div>
+      {verificacion ? (
+        <>
+          <p className={styles.estado}>
+            <strong>Estado:</strong>{" "}
+            {verificacion.estado?.toUpperCase() || verificationStatus?.toUpperCase() || "PENDIENTE"}
+          </p>
 
-      <div className={styles.trabajos}>
-        <p><strong>Trabajos realizados:</strong></p>
-        <div className={styles.trabajosGrid}>
-          {verificacion.trabajos_urls.map((url, i) => (
-            <img key={i} src={url} alt={`Trabajo ${i + 1}`} className={styles.trabajoImg} />
-          ))}
-        </div>
-      </div>
+          <div className={styles.docsGrid}>
+            <div>
+              <p><strong>DNI:</strong></p>
+              <img src={verificacion.dni_url} alt="DNI" className={styles.image} />
+            </div>
+            <div>
+              <p><strong>Certificado domicilio:</strong></p>
+              <img src={verificacion.certificado_url} alt="Certificado" className={styles.image} />
+            </div>
+          </div>
+
+          <div className={styles.trabajos}>
+            <p><strong>Trabajos realizados:</strong></p>
+            <div className={styles.trabajosGrid}>
+              {verificacion.trabajos_urls?.map((url, i) => (
+                <img key={i} src={url} alt={`Trabajo ${i + 1}`} className={styles.trabajoImg} />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className={styles.estado}>No has enviado ninguna verificación aún.</p>
+          <ActualizarVerificacion userId={userId} />
+        </>
+      )}
     </section>
   );
 }

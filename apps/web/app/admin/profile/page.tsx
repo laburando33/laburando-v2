@@ -113,10 +113,11 @@ export default function ProfilePage() {
     if (updateError) {
       console.error("❌ Error actualizando avatar:", updateError.message);
     } else {
-      setProfile(prev => ({
+      setProfile((prev: any) => ({
         ...prev,
         avatar_url: publicUrl.publicUrl
       }));
+      console.log("✅ Avatar actualizado");
     }
 
     setAvatarUploading(false);

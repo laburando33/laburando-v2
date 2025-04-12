@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@lib/supabase-web";
 import styles from "./admin.module.css";
 import VerificacionEstado from "../../components/profesional/VerificacionEstado";
-import DashboardVerificacionProfesional from "../../components//profesionalDashboardVerificacionProfesional";
 
 interface Request {
   id: number;

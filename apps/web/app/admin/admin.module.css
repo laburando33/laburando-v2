@@ -1,30 +1,150 @@
-.main {
-    padding: 2rem;
-    max-width: 1000px;
-    margin: auto;
+/* admin.module.css */
+
+.profileContainer {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: black;
+}
+ 
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+.noAvatar {
+  width: 120px;
+  height: 120px;
+  background-color: #eee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+}
+
+.fileInput {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.data {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: black;
+}
+
+.data p {
+  margin: 0;
+}
+
+.inputField,
+.textAreaField {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.textAreaField {
+  resize: vertical;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.saveButton,
+.cancelButton,
+.editButton {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cancelButton {
+  background-color: #888;
+}
+
+.saveButton:hover,
+.cancelButton:hover,
+.editButton:hover {
+  background-color: #005bb5;
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 2rem;
+}
+
+@media (max-width: 600px) {
+  .profileContainer {
+    padding: 1rem;
   }
-  
+
   .title {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
   }
-  
-  .loading,
-  .error {
-    text-align: center;
-    padding: 2rem;
+
+  .avatar {
+    width: 100px;
+    height: 100px;
   }
-  
+
+  .inputField,
+  .fileInput,
+  .textAreaField {
+    font-size: 0.95rem;
+    padding: 0.5rem;
+  }
+
+  .saveButton,
+  .cancelButton,
+  .editButton {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
+}
+@media (max-width: 768px) {
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
   .table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
+    min-width: 600px;
   }
-  
-  .table th,
-  .table td {
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    text-align: left;
-  }
-  
+}

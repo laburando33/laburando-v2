@@ -12,7 +12,9 @@
       ],
       "@repo/ui": [
         "./components/Header"
-      ]
+      ], 
+      "@lib/*": ["lib/*"]
+
     },
     "plugins": [
       {

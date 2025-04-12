@@ -18,7 +18,7 @@
   "devDependencies": {
     "@babel/plugin-transform-flow-strip-types": "^7.26.5",
     "expo": "^50.0.0",
-    "turbo": "^2.4.4"
+    "turbo": "^2.5.0"
   },
   "dependencies": {
     "@expo/next-adapter": "^6.0.0",

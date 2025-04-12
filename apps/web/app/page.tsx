@@ -28,7 +28,7 @@ import {
 } from "react-icons/io5";
 import Header from "../components/Header";
 import styles from "./page.module.css";
-import { supabase } from "@lib/web-supabase"; // ✅ AGREGADO
+import { supabase } from "@lib/supabase-web"; // ✅ AGREGADO
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");

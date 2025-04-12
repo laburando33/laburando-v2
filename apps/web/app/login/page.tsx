@@ -1,74 +1,72 @@
 "use client";
 
-import React, { useState } from "react";
-import styles from "./login.module.css";
-import { supabase } from "@lib/web-supabase";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@lib/supabase-web";
+import { createProfessionalProfile } from "@lib/createProfessionalProfile";
+import styles from "./login.module.css";
 
 export default function LoginPage() {
-  const [role, setRole] = useState<"cliente" | "profesional" | null>(null);
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setMessage("");
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
 
-    const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-            emailRedirectTo: "http://localhost:3000/auth/callback",
-            data: { role },
-        },
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
     if (error) {
-      setMessage("❌ Error al enviar el link: " + error.message);
-    } else {
-      setMessage("✅ Revisá tu correo para continuar el acceso.");
+      setErrorMessage("❌ " + error.message);
+      return;
     }
 
-    setLoading(false);
+    const user = data?.user;
+    if (!user) {
+      setErrorMessage("❌ Usuario no encontrado.");
+      return;
+    }
+
+    // ✅ Crear perfil directamente
+    await createProfessionalProfile(user);
+
+    // 🔁 Refrescar sesión
+    await supabase.auth.getSession();
+
+    // Redirigir al dashboard
+    router.push("/admin/profile");
   };
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Iniciar sesión</h1>
-
-      {!role ? (
-        <div className={styles.options}>
-          <button onClick={() => setRole("cliente")} className={styles.option}>
-            Soy Cliente
-          </button>
-          <button onClick={() => setRole("profesional")} className={styles.option}>
-            Soy Profesional
-          </button>
-        </div>
-      ) : (
-        <div className={styles.formContainer}>
-          <p>Iniciar sesión como <strong>{role}</strong></p>
-          <input
-            type="email"
-            placeholder="Email"
-            className={styles.input}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button
-            className={styles.loginButton}
-            onClick={handleLogin}
-            disabled={loading || !email}
-          >
-            {loading ? "Enviando..." : "Enviar link mágico"}
-          </button>
-          {message && <p>{message}</p>}
-          <button onClick={() => setRole(null)} className={styles.backButton}>
-            ← Volver
-          </button>
-        </div>
-      )}
+      <form onSubmit={handleLogin} className={styles.formContainer}>
+        <h1 className={styles.title}>Iniciar sesión</h1>
+        <input
+          type="email"
+          placeholder="Correo"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className={styles.input}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className={styles.input}
+        />
+        <button type="submit" className={styles.loginButton}>
+          Ingresar
+        </button>
+        {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+      </form>
     </main>
   );
 }

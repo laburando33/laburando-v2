@@ -1,11 +1,18 @@
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 50px 1rem;
+
+  padding: 2.5rem 1rem;        /* Bajamos el padding superior para no duplicar altura */
   background-color: #fff;
   border-bottom: 1px solid #ddd;
-  height: 60px;
+  height: 64px;           /* Altura estándar consistente */
 }
 
 .logoContainer {
@@ -163,5 +170,42 @@
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .logoContainer {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .mobileMenuIcon {
+    display: block;
+  }
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    padding: 1rem 0;
+    z-index: 1000;
+  }
+
+  .nav.navMobileOpen {
+    display: flex;
+  }
+
+  .ctaButton {
+    width: 90%;
+    margin: 0 auto;
+    text-align: center;
   }
 }

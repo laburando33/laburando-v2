@@ -11,13 +11,17 @@
   },
   "dependencies": {
     "@expo/next-adapter": "^6.0.0",
+    "@hookform/resolvers": "^5.0.1",
     "@repo/ui": "*",
-    "@supabase/supabase-js": "^2.49.3",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/auth-helpers-react": "^0.5.0",
+    "@supabase/supabase-js": "^2.49.4",
     "expo-dev-client": "^5.0.18",
     "next": "^15.2.1",
     "qrcode.react": "^4.2.0",
     "react-device-detect": "^2.2.3",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",

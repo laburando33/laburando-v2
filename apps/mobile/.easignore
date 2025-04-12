@@ -26,3 +26,9 @@ node_modules/
 coverage/
 build/
 dist/
+# Evita subir binarios de npm global
+C:\Users\PC\AppData\Roaming\npm
+%APPDATA%\npm
+UsersPCAppDataRoamingnpm/
+/android
+/ios

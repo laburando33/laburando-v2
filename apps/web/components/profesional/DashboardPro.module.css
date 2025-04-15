@@ -1,0 +1,98 @@
+.container {
+    padding: 1rem;
+    max-width: 850px;
+    margin: auto;
+  }
+  
+  /* Encabezado */
+  .heroBanner {
+    background: #fde68a;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .heroBanner h2 {
+    margin: 0;
+  }
+  
+  .statsGrid {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .statCard {
+    background: #fffbe6;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    flex: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .statCard strong {
+    font-size: 1.8rem;
+    color: #fcb500;
+  }
+  
+  /* Botones de acción */
+  .actionButtons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  .actionButtons button {
+    background: #fcb500;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  
+  .actionButtons button:hover {
+    background-color: #e0a800;
+  }
+  
+  /* Lista de solicitudes */
+  .requestList {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+  }
+  
+  .requestItem {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }
+  .alert {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+  
+  .tipBox {
+    background-color: #e0f7fa;
+    color: #006064;
+    border: 1px solid #b2ebf2;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    margin-top: 2rem;
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+  

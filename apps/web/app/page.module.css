@@ -5,7 +5,7 @@
 }
 
 .page {
-  font-family: "Geist", sans-serif;
+  font-family: poppins, sans-serif;
   background-color: #f9f9f9;
   color: #333;
 }
@@ -99,8 +99,11 @@
 .sectionTitle {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
+  margin-top: 90px;
   font-weight: bold;
   text-align: center;
+  font-family: poppins, sans-serif;
+
 }
 
 .servicesGrid {
@@ -128,9 +131,9 @@
 }
 
 .serviceIconContainer {
-  background-color: #fcb500;
+  background-color: #fcd93f;
   border-radius: 50%;
-  padding: 0.5rem;
+  padding: 2rem;
   margin-bottom: 0.5rem;
 }
 
@@ -142,7 +145,7 @@
 
 .moreServicesButton,
 .ctaButton {
-  background-color: #fcb500;
+  background-color: #fcd93f;
   color: #fff;
   padding: 0.75rem;
   border: none;
@@ -154,11 +157,12 @@
   margin-top: 1rem;
   width: 100%;
   transition: background-color 0.2s ease;
+  font-family: poppins, sans-serif;
 }
 
 .moreServicesButton:hover,
 .ctaButton:hover {
-  background-color: #e0a800;
+  background-color: black;
 }
 
 /* Beneficios */
@@ -172,22 +176,29 @@
   flex-wrap: wrap;
   gap: 2rem;
   justify-content: space-between;
+  padding: 30px;
+  border-radius: 8px;
+  background-color: black;
 }
 
 .benefitItem {
   flex: 1 1 250px;
   text-align: center;
+  color: #fcd93f;
+  padding: 30px;
 }
 
 .benefitTitle {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
   font-weight: bold;
+  font-family: poppins, sans-serif;
+
 }
 
 .benefitText {
   font-size: 0.95rem;
-  color: #555;
+  color: #fff;
 }
 
 /* Formulario y Opiniones */
@@ -201,6 +212,7 @@
 
 .formSection {
   flex: 1;
+  font-family: poppins, sans-serif;
 }
 
 .form {
@@ -243,13 +255,15 @@
 }
 
 .reviewText {
+  font-family: poppins, sans-serif;
+
   font-size: 1rem;
   color: #333;
 }
 
 .reviewRating {
   margin-top: 0.5rem;
-  color: #fcb500;
+  color:#fcd93f;
   font-size: 1.1rem;
 }
 
@@ -282,6 +296,8 @@
   margin-top: 0.5rem;
   font-size: 0.9rem;
   text-align: center;
+  color:#fcd03f;
+
 }
 
 .legalSection {
@@ -311,7 +327,7 @@
 }
 
 .link {
-  color: #fcb500;
+  color: #fcd93f;
   text-decoration: underline;
   margin: 0 0.5rem;
 }
@@ -348,4 +364,11 @@
   .inputField {
     font-size: 0.95rem;
   }
+}
+.proAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
 }

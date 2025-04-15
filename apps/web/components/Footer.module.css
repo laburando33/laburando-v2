@@ -7,7 +7,7 @@
   justify-content: center;
   padding: 2rem 1rem;
   background-color: black;
-  color: #fff;
+  color: #fcd03f;
   text-align: center;
   font-size: 0.9rem;
   border-top: 1px solid #ddd;
@@ -31,12 +31,13 @@
 }
 
 .links {
+  color:#fcd03f;
   margin-top: 0.5rem;
 }
 
 .link {
   margin: 0 0.75rem;
-  color: #fcb500;
+  color:#fcd03f;
   text-decoration: none;
   font-weight: 500;
 }

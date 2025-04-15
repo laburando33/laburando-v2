@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@lib/supabase-web";
-import { createProfessionalProfile } from "@lib/createProfessionalProfile";
+import { supabase } from "../../../lib/supabase-web";
+import { createProfessionalProfile } from "../../../lib/createProfessionalProfile";
 
 export default function CallbackPage() {
   const router = useRouter();

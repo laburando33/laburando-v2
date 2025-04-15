@@ -1,151 +1,89 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@lib/supabase-web";
 import styles from "./admin.module.css";
-import VerificacionEstado from "../../components/profesional/VerificacionEstado";
+import { useRouter } from "next/navigation";
 
-interface Request {
-  id: number;
-  job_description: string;
-  category: string;
-  location: string;
-  user_email: string;
-  created_at: string;
-  status: string;
-}
-
-export default function AdminPage() {
-  const [loading, setLoading] = useState(true);
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [fullName, setFullName] = useState("");
-  const [error, setError] = useState<string | null>(null);
+export default function ProfessionalDashboard() {
   const [userId, setUserId] = useState<string | null>(null);
-
+  const [name, setName] = useState("");
+  const [requests, setRequests] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    const loadDashboard = async () => {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return router.replace("/login");
 
-      if (!user || userError) {
-        return router.replace("/login");
-      }
+      setUserId(user.id);
 
-      setUserId(user.id); // ✅ Guardamos userId para usarlo fuera
-
-      const { data: profileRole, error: roleError } = await supabase
-        .from("professionals")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (roleError || !profileRole) {
-        alert("No tenés perfil profesional.");
-        return router.replace("/login");
-      }
-
-      if (profileRole.role === "admin") {
-        return router.replace("/admin/verify");
-      }
-
-      const { data: profile, error: profileErr } = await supabase
+      const { data: profile } = await supabase
         .from("professionals")
         .select("full_name")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileErr || !profile) {
-        setError("No se pudo cargar tu perfil.");
-        return setLoading(false);
-      }
+      setName(profile?.full_name || "Profesional");
 
-      setFullName(profile.full_name);
-
-      const { data: serviceData, error: serviceErr } = await supabase
-        .from("professional_services")
-        .select("service_id")
-        .eq("professional_id", user.id);
-
-      if (serviceErr || !serviceData) {
-        setError("No se pudieron cargar tus servicios.");
-        return setLoading(false);
-      }
-
-      const serviceIds = serviceData.map((s) => s.service_id);
-
-      const { data: reqData, error: reqErr } = await supabase
+      const { data: reqs } = await supabase
         .from("requests")
         .select("*")
-        .in("category", serviceIds)
+        .contains("paid_professionals", [user.id])
         .order("created_at", { ascending: false });
 
-      if (reqErr) {
-        setError("Error al cargar las solicitudes.");
-      } else {
-        setRequests(reqData || []);
-      }
-
-      setLoading(false);
+      setRequests(reqs || []);
     };
 
-    loadDashboard();
+    load();
   }, [router]);
 
-  if (loading) return <p className={styles.loading}>Cargando panel...</p>;
-  if (error) return <p className={styles.error}>{error}</p>;
+  const totalPendientes = requests.filter(r => r.status === "pending").length;
+  const totalEnviados = requests.filter(r => r.status === "in_progress").length;
+  const totalCompletados = requests.filter(r => r.status === "done").length;
 
   return (
-    <main className={styles.main}>
-      <h1 className={styles.title}>Hola, {fullName} 👷</h1>
-      <p className={styles.subtitle}>Solicitudes relacionadas con tus servicios:</p>
+    <main className={styles.profileContainer}>
+      <div className={styles.heroBanner}>
+        <h2>👋 Bienvenido, {name}</h2>
+        <p>Panel de profesional</p>
+      </div>
 
-      {requests.length === 0 ? (
-        <p>No hay solicitudes por ahora.</p>
-      ) : (
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Servicio</th>
-                <th>Descripción</th>
-                <th>Ubicación</th>
-                <th>Email</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((req) => (
-                <tr key={req.id}>
-                  <td>{req.category}</td>
-                  <td>{req.job_description}</td>
-                  <td>{req.location}</td>
-                  <td>{req.user_email}</td>
-                  <td>{new Date(req.created_at).toLocaleString()}</td>
-                  <td>{req.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <strong>{totalPendientes}</strong>
+          <span>Disponibles</span>
         </div>
-      )}
+        <div className={styles.statCard}>
+          <strong>{totalEnviados}</strong>
+          <span>Presupuestados</span>
+        </div>
+        <div className={styles.statCard}>
+          <strong>{totalCompletados}</strong>
+          <span>Completados</span>
+        </div>
+      </div>
 
-      {userId && (
-        <section style={{ marginTop: "2rem" }}>
-          <h2 className={styles.title}>🛡 Estado de tu verificación</h2>
-          <VerificacionEstado userId={userId} />
-        </section>
-      )}
+      <div className={styles.actionButtons}>
+        <button onClick={() => router.push("/admin/shop")}>🛒 Comprar Créditos</button>
+        <button onClick={() => router.push("/admin")}>🔍 Ver Solicitudes</button>
+      </div>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2 className={styles.title}>💡 Comprar LEDs</h2>
-        <p>Próximamente vas a poder adquirir materiales directamente desde este panel.</p>
-      </section>
+      <h3 style={{ marginTop: "2rem" }}>🗂 Tus solicitudes recientes</h3>
+      <ul className={styles.requestList}>
+        {requests.length === 0 ? (
+          <p>No hay solicitudes desbloqueadas todavía.</p>
+        ) : (
+          requests.slice(0, 5).map((r) => (
+            <li key={r.id} className={styles.requestItem}>
+              <strong>📝 {r.category}</strong>
+              <p>{r.job_description}</p>
+              <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
+              <span>📌 Estado: {r.status}</span>
+            </li>
+          ))
+        )}
+      </ul>
     </main>
   );
 }

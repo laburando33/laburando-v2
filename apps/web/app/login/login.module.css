@@ -43,12 +43,17 @@
 }
 
 .loginButton {
-  background-color: #171717;
+  background-color:#fcd03f;
+  font-family: 'poppins';
   color: #fff;
   padding: 1rem;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
+}
+.loginButton:hover {
+  background-color: black;
+  color: #fff;
 }
 
 .link {

@@ -2,9 +2,8 @@ import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Metadata } from "next";
-import { createBrowserClient } from '@supabase/auth-helpers-nextjs';
-
-import { Providers } from "./providers"; // 👈 Importante
+import { Providers } from "./providers";
+import OneSignalInit from "../components/OneSignalInit"; // ✅ Integración de OneSignal
 
 export const metadata: Metadata = {
   title: "Laburando App",
@@ -18,12 +17,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
+      <head>
+        {/* 👉 Para precargar la librería de OneSignal vía CDN (opcional pero recomendado) */}
+        <script
+          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+          defer
+        ></script>
+      </head>
       <body className="layout">
         <Providers>
+          <OneSignalInit /> {/* 🚀 Inicializa OneSignal */}
           <Header />
-          <main className="main-content">
-          {children}
-          </main>
+          <main className="main-content">{children}</main>
           <Footer />
         </Providers>
       </body>

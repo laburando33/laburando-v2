@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { supabase } from "@lib/supabase-web";
-import styles from "../../login/login.module.css";
+import { supabase } from "../../../lib/supabase-web";
+import styles from "../../login/login.module.css"; // <- ajustado para ruta correcta
 
 const allServices = [
   { id: 1, name: "Albañil" },
@@ -32,11 +32,7 @@ const schema = z
   .object({
     name: z.string().min(2),
     email: z.string().email(),
-    phone: z
-      .string()
-      .regex(/^(\+54|0)?(11|[2368]\d)(\d{6,8})$/, {
-        message: "Número de teléfono argentino inválido",
-      }),
+    phone: z.string().min(8, { message: "Teléfono inválido" }),
     location: z.string().min(2),
     experience: z.string(),
     description: z.string().optional(),
@@ -101,7 +97,6 @@ export default function ProfessionalRegisterPage() {
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: "http://localhost:3000/auth/callback",
           data: {
             full_name: formData.name,
             is_professional: true,
@@ -110,32 +105,34 @@ export default function ProfessionalRegisterPage() {
         },
       });
 
-      const user = data.user;
-      if (error || !user) throw error ?? new Error("No se creó el usuario");
+      if (error || !data.user) throw error ?? new Error("No se creó el usuario");
+      const userId = data.user.id;
 
       const { error: profError } = await supabase.from("professionals").insert({
-        user_id: user.id,
+        user_id: userId,
         full_name: formData.name,
         email: formData.email,
         phone: formData.phone,
         location: formData.location,
         job_description: formData.description || "",
+        role: "profesional",
       });
 
       if (profError) throw profError;
 
-      for (const service_id of formData.selectedServiceIds) {
-        const { error: relError } = await supabase.from("professional_services").insert({
-          professional_id: user.id,
-          service_id,
-        });
-        if (relError) throw relError;
-      }
+      const serviciosData = formData.selectedServiceIds.map((service_id) => ({
+        user_id: userId,
+        service_id,
+      }));
+
+      const { error: relError } = await supabase.from("professional_services").insert(serviciosData);
+      if (relError) throw relError;
 
       setMessage("✅ Registro exitoso. Revisá tu correo.");
       router.push("/login");
     } catch (err: any) {
       setMessage(`❌ Error: ${err.message}`);
+      console.error(err);
     } finally {
       setLoading(false);
     }

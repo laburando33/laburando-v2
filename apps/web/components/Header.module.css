@@ -44,16 +44,17 @@
 
 .ctaButton {
   padding: 10px 20px;
-  background-color: #fcb500;
+  background-color: #fcd93f;
   color: #fff;
   text-decoration: none;
   border-radius: 8px;
-  font-weight: bold;
+  
   transition: background-color 0.3s ease;
+  font-family: 'Poppins';
 }
 
 .ctaButton:hover {
-  background-color: #e0a800;
+  background-color: black;
 }
 
 /* Ícono del menú móvil */

@@ -1,5 +1,5 @@
 // apps/web/lib/createProfessionalProfile.ts
-import { supabase } from "@lib/supabase-web";
+import { supabase } from "./supabase-web";
 
 export async function createProfessionalProfile(user: any) {
   if (!user?.id) {

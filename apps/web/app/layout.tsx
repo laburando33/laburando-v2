@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Metadata } from "next";
 import { Providers } from "./providers";
-import OneSignalInit from "../components/OneSignalInit"; // ✅ Integración de OneSignal
+import OneSignalInit from "../components/OneSignalInit";
 
 export const metadata: Metadata = {
   title: "Laburando App",
@@ -18,15 +18,16 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* 👉 Para precargar la librería de OneSignal vía CDN (opcional pero recomendado) */}
+        {/* ✅ Precarga la librería de OneSignal (CDN) */}
         <script
           src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
           defer
-        ></script>
+        />
       </head>
       <body className="layout">
         <Providers>
-          <OneSignalInit /> {/* 🚀 Inicializa OneSignal */}
+          {/* ✅ Inicialización segura de OneSignal */}
+          <OneSignalInit />
           <Header />
           <main className="main-content">{children}</main>
           <Footer />

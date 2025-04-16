@@ -27,6 +27,7 @@ import {
 } from "react-icons/io5";
 import styles from "./page.module.css";
 import { supabase } from "../lib/supabase-web";
+import OneSignal from 'react-onesignal';
 
 export default function HomePage() {
   const router = useRouter();

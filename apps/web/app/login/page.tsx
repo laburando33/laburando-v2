@@ -1,72 +1,78 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@lib/supabase-web";
-import { createProfessionalProfile } from "@lib/createProfessionalProfile";
-import styles from "./login.module.css";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/supabase';
+import styles from './login.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const supabase = createClientComponentClient<Database>();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // 🔐 Si ya está logueado, redirigimos
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        router.replace('/admin');
+      }
+    };
+    checkSession();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage("");
+    setErrorMsg('');
+    setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setErrorMessage("❌ " + error.message);
+      setErrorMsg('Error al iniciar sesión. Verifica tus credenciales.');
+      setLoading(false);
       return;
     }
 
-    const user = data?.user;
-    if (!user) {
-      setErrorMessage("❌ Usuario no encontrado.");
-      return;
-    }
-
-    // ✅ Crear perfil directamente
-    await createProfessionalProfile(user);
-
-    // 🔁 Refrescar sesión
-    await supabase.auth.getSession();
-
-    // Redirigir al dashboard
-    router.push("/admin/profile");
+    // 🕐 Pequeño delay por sincronización de cookie
+    setTimeout(() => {
+      router.refresh();
+      router.push('/admin/profile');
+    }, 500);
   };
 
   return (
-    <main className={styles.main}>
-      <form onSubmit={handleLogin} className={styles.formContainer}>
-        <h1 className={styles.title}>Iniciar sesión</h1>
+    <div className={styles.main}>
+      <h1 className={styles.title}>Iniciar sesión</h1>
+      <form className={styles.formContainer} onSubmit={handleLogin}>
         <input
+          className={styles.input}
           type="email"
           placeholder="Correo"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className={styles.input}
         />
         <input
+          className={styles.input}
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className={styles.input}
         />
-        <button type="submit" className={styles.loginButton}>
-          Ingresar
+        <button className={styles.loginButton} type="submit" disabled={loading}>
+          {loading ? 'Ingresando...' : 'Ingresar'}
         </button>
-        {errorMessage && <p className={styles.error}>{errorMessage}</p>}
       </form>
-    </main>
+      {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
+    </div>
   );
 }

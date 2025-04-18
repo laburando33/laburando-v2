@@ -4,6 +4,10 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
+      "@/*": [
+        "./*"
+      ],
+
       "@repo/ui/*": [
         "../packages/ui/*"
       ],

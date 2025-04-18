@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase-web';
 export const usePerfil = () => {
   const [perfil, setPerfil] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPerfil = async () => {

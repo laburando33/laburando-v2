@@ -1,58 +1,51 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabase-web';
-import styles from './page.module.css'; // asegurate de tenerlo
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { getProfessionalsByService } from '../list'
+import styles from './page.module.css'
 
-export default function ProfesionalesPage() {
-  const { category } = useParams();
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function ProfesionalesPorCategoria() {
+  const { category } = useParams()
+  const [results, setResults] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchProfessionals = async () => {
-      setLoading(true);
+    const fetchData = async () => {
+      const servicio = decodeURIComponent(category as string)
+      const data = await getProfessionalsByService(servicio)
+      setResults(data)
+      setLoading(false)
+    }
+    if (category) fetchData()
+  }, [category])
 
-      const { data, error } = await supabase
-        .from('view_professionals_with_categories') // tu vista segura
-        .select('*')
-        .ilike('category', `%${category}%`);
+  if (loading) return <p style={{ padding: 20 }}>Cargando...</p>
 
-      if (error) {
-        console.error('❌ Error cargando profesionales:', error.message);
-      } else {
-        setResults(data || []);
-      }
-
-      setLoading(false);
-    };
-
-    fetchProfessionals();
-  }, [category]);
+  if (!results.length) return <p style={{ padding: 20 }}>No se encontraron profesionales para "{category}"</p>
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Profesionales para "{decodeURIComponent(category as string)}"</h1>
-
-      {loading ? (
-        <p>Cargando profesionales...</p>
-      ) : results.length === 0 ? (
-        <p>No se encontraron profesionales.</p>
-      ) : (
-        <div className={styles.grid}>
-          {results.map((pro) => (
-            <div key={pro.user_id} className={styles.card}>
-              <img src={pro.avatar_url || '/default-user.png'} alt={pro.full_name} className={styles.avatar} />
+    <div className={styles.page}>
+      <h1 className={styles.sectionTitle}>Profesionales para "{category}"</h1>
+      <div className={styles.resultsGrid}>
+        {results.map((item, idx) => {
+          const pro = item.professionals
+          return (
+            <div key={idx} className={styles.proCard}>
+              <img
+                src={pro.avatar_url || '/default-user.png'}
+                alt={pro.full_name}
+                className={styles.proAvatar}
+              />
               <h3>{pro.full_name}</h3>
-              <p>{pro.job_description}</p>
+              <p><strong>Ubicación:</strong> {pro.location || 'No especificada'}</p>
               <p><strong>Email:</strong> {pro.email}</p>
-              <p><strong>Tel:</strong> {pro.phone}</p>
-              <p><strong>Categorías:</strong> {pro.categories?.join(", ")}</p>
-              </div>
-          ))}
-        </div>
-      )}
+              <p><strong>Teléfono:</strong> {pro.phone}</p>
+              <p><strong>Categoría:</strong> {pro.category}</p>
+            </div>
+          )
+        })}
+      </div>
     </div>
-  );
+  )
 }

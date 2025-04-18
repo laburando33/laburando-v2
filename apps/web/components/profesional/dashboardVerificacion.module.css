@@ -1,3 +1,6 @@
+.verificacionBox {
+  padding: 30px;
+}
 .actualizarBox {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -6,7 +9,9 @@
     border-radius: 10px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   }
-  
+  .main {
+    padding: 50px !important;
+  }
   .actualizarBox h3 {
     font-size: 1.2rem;
     margin-bottom: 1rem;

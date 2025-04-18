@@ -1,33 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from './types/supabase'; // <-- adaptá esto si usás typings distintos
+// middleware.ts
+import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const supabase = createMiddlewareClient<Database>({ req, res });
+
+  const supabase = createMiddlewareClient({ req, res });
 
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (session) {
-    const user = session.user;
-    const isPro = user.user_metadata?.is_professional;
-    const role = user.user_metadata?.role;
+  const url = req.nextUrl;
 
-    const pathname = req.nextUrl.pathname;
+  const isLoggedIn = !!session?.user;
+  const isLoginPage = url.pathname === "/login";
 
-    if (
-      (isPro || role === 'profesional') &&
-      (pathname === '/' || pathname === '/login')
-    ) {
-      return NextResponse.redirect(new URL('/admin/profile', req.url));
-    }
+  const protectedRoutes = ["/admin", "/admin/profile", "/admin/solicitudes"];
+  const isProtected = protectedRoutes.some((route) => url.pathname.startsWith(route));
+
+  // 🔐 Si intenta entrar a ruta protegida sin sesión -> redirigimos
+  if (isProtected && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/login?msg=auth", req.url));
+  }
+
+  // ⛔ Si ya está logueado y va a login, lo mandamos al dashboard
+  if (isLoginPage && isLoggedIn) {
+    return NextResponse.redirect(new URL("/admin", req.url));
   }
 
   return res;
 }
 
 export const config = {
-  matcher: ['/', '/login'],
+  matcher: ["/admin/:path*", "/admin", "/login"],
 };

@@ -13,6 +13,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
   }
 
+  // ✅ Cálculo seguro del precio final
+  const finalPrice = amount || credits * 1000; // podés ajustar el valor base por crédito
+
   // Sumar créditos (RPC)
   const { error: rpcError } = await supabase.rpc("add_credits", {
     uid: userId,
@@ -35,7 +38,7 @@ export async function POST(req: Request) {
   const { error: insertError } = await supabase.from("credit_purchases").insert({
     user_id: userId,
     credits,
-    price: finalPrice, // <- CAMBIO AQUÍ
+    price: finalPrice,
     plan_name,
     coupon,
     nombre: prof?.full_name || "—",

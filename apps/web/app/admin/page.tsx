@@ -1,89 +1,60 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@lib/supabase-web";
-import styles from "./admin.module.css";
-import { useRouter } from "next/navigation";
+import { useSession } from "@supabase/auth-helpers-react";
+import { supabase } from "@/lib/supabase-web";
 
-export default function ProfessionalDashboard() {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [requests, setRequests] = useState<any[]>([]);
-  const router = useRouter();
+export default function AdminProfilePage() {
+  const session = useSession();
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return router.replace("/login");
+    const fetchVerification = async () => {
+      if (!session?.user) return;
 
-      setUserId(user.id);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_verified")
+        .eq("id", session.user.id)
+        .single();
 
-      const { data: profile } = await supabase
-        .from("professionals")
-        .select("full_name")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      if (error) {
+        console.error("❌ Error al traer verificación:", error.message);
+        setIsVerified(null);
+      } else {
+        setIsVerified(data.is_verified);
+      }
 
-      setName(profile?.full_name || "Profesional");
-
-      const { data: reqs } = await supabase
-        .from("requests")
-        .select("*")
-        .contains("paid_professionals", [user.id])
-        .order("created_at", { ascending: false });
-
-      setRequests(reqs || []);
+      setLoading(false);
     };
 
-    load();
-  }, [router]);
+    fetchVerification();
+  }, [session]);
 
-  const totalPendientes = requests.filter(r => r.status === "pending").length;
-  const totalEnviados = requests.filter(r => r.status === "in_progress").length;
-  const totalCompletados = requests.filter(r => r.status === "done").length;
+  if (!session) {
+    return (
+      <div style={{ padding: "2rem" }}>
+        <h2>❌ No hay sesión activa</h2>
+        <p>Redirigite a <a href="/login">/login</a></p>
+      </div>
+    );
+  }
 
   return (
-    <main className={styles.profileContainer}>
-      <div className={styles.heroBanner}>
-        <h2>👋 Bienvenido, {name}</h2>
-        <p>Panel de profesional</p>
-      </div>
+    <div style={{ padding: "2rem" }}>
+      <h1>👤 Panel Profesional (Debug)</h1>
 
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <strong>{totalPendientes}</strong>
-          <span>Disponibles</span>
-        </div>
-        <div className={styles.statCard}>
-          <strong>{totalEnviados}</strong>
-          <span>Presupuestados</span>
-        </div>
-        <div className={styles.statCard}>
-          <strong>{totalCompletados}</strong>
-          <span>Completados</span>
-        </div>
-      </div>
-
-      <div className={styles.actionButtons}>
-        <button onClick={() => router.push("/admin/shop")}>🛒 Comprar Créditos</button>
-        <button onClick={() => router.push("/admin")}>🔍 Ver Solicitudes</button>
-      </div>
-
-      <h3 style={{ marginTop: "2rem" }}>🗂 Tus solicitudes recientes</h3>
-      <ul className={styles.requestList}>
-        {requests.length === 0 ? (
-          <p>No hay solicitudes desbloqueadas todavía.</p>
-        ) : (
-          requests.slice(0, 5).map((r) => (
-            <li key={r.id} className={styles.requestItem}>
-              <strong>📝 {r.category}</strong>
-              <p>{r.job_description}</p>
-              <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
-              <span>📌 Estado: {r.status}</span>
-            </li>
-          ))
-        )}
+      <ul style={{ lineHeight: "2em" }}>
+        <li><strong>ID:</strong> {session.user.id}</li>
+        <li><strong>Email:</strong> {session.user.email}</li>
+        <li><strong>Rol:</strong> {session.user.user_metadata?.role}</li>
+        <li><strong>Nombre:</strong> {session.user.user_metadata?.full_name}</li>
+        <li><strong>Teléfono:</strong> {session.user.user_metadata?.phone}</li>
+        <li><strong>Ubicación:</strong> {session.user.user_metadata?.location}</li>
+        <li><strong>Categoría:</strong> {session.user.user_metadata?.category}</li>
+        <li><strong>is_verified:</strong> {loading ? "Cargando..." : String(isVerified)}</li>
       </ul>
-    </main>
+    </div>
   );
 }

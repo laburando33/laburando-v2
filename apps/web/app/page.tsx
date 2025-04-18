@@ -110,7 +110,7 @@ export default function HomePage() {
       <main className={styles.main}>
         {/* Hero */}
         <section className={styles.hero}>
-          <img src="principal2-laburandoApp.jpg" alt="Laburando" width="30%" height="30%" />
+          <img src="pintor.png" alt="Laburando" width="30%" height="30%" />
           <h1 className={styles.heroTitle}>¡Soluciones para tu hogar al TOQUE!</h1>
           <p className={styles.heroSubtitle}>
             Conectá con expertos que quieren laburar. ¡Rápido y sin vueltas!

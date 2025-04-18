@@ -1,118 +1,112 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '../../../lib/supabase-web';
-import OneSignal from 'react-onesignal';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../../lib/supabase-web";
+import styles from "../../admin/admin.module.css";
 
 export default function RegistroProfesional() {
   const router = useRouter();
-
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('');
-  const [category, setCategory] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [form, setForm] = useState({
+    full_name: "",
+    email: "",
+    password: "",
+    phone: "+54",
+    location: "",
+    category: "",
+    acepta: false,
+  });
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
-  const handleRegister = async () => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage("");
     setLoading(true);
-    setError('');
 
-    if (!email || !password || !fullName || !location || !category) {
-      setError('Todos los campos obligatorios deben completarse');
-      setLoading(false);
-      return;
-    }
-
-    if (!acceptTerms) {
-      setError('Debes aceptar los términos y condiciones');
+    if (!form.acepta) {
+      setError("Debés aceptar los Términos y Condiciones.");
       setLoading(false);
       return;
     }
 
     const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
+      email: form.email,
+      password: form.password,
       options: {
         data: {
-          full_name: fullName,
+          full_name: form.full_name,
+          phone: form.phone,
+          location: form.location,
+          category: form.category,
+          role: "profesional",
           is_professional: true,
-          role: 'profesional',
         },
-        emailRedirectTo: `${location.origin}/login`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
       },
     });
 
-    const userId = data.user?.id || data.session?.user?.id;
-
-    if (signUpError || !userId) {
-      setError(signUpError?.message || 'Error al crear usuario');
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
       return;
     }
 
-    const { error: insertError } = await supabase.from('professionals').insert({
-      user_id: userId,
-      full_name: fullName,
-      email,
-      phone,
-      location,
-      category,
-      job_description: jobDescription,
-      is_verified: false,
-      verificacion_status: 'no_verificado',
-      role: 'profesional',
-    });
-
-    if (insertError) {
-      setError(insertError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Intentar setear OneSignal ID
-    try {
-      await OneSignal.setExternalUserId(userId);
-    } catch (err) {
-      console.warn('No se pudo setear OneSignal user ID:', err);
-    }
-
-    setSuccess(true);
+    setSuccessMessage("📩 Revisa tu correo y confirmá tu cuenta para completar el registro.");
     setLoading(false);
-    setTimeout(() => {
-      router.push('/login');
-    }, 2500);
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: 'auto', padding: '2rem' }}>
-      <h2>Registro Profesional</h2>
+    <main className={styles.profileContainer}>
+      <h1 className={styles.title}>Registro Profesional</h1>
+      <form onSubmit={handleSubmit} className={styles.formContainer}>
+        {/* campos */}
+        <label className={styles.label}>Nombre completo</label>
+        <input name="full_name" value={form.full_name} onChange={handleChange} required className={styles.inputField} />
 
-      <input placeholder="Nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-      <input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input placeholder="Contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <input placeholder="Teléfono (opcional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
-      <input placeholder="Ubicación" value={location} onChange={(e) => setLocation(e.target.value)} />
-      <input placeholder="Categoría o Rubro" value={category} onChange={(e) => setCategory(e.target.value)} />
-      <textarea placeholder="Descripción del trabajo (opcional)" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} />
+        <label className={styles.label}>Email</label>
+        <input name="email" type="email" value={form.email} onChange={handleChange} required className={styles.inputField} />
 
-      <label style={{ display: 'block', marginTop: '1rem' }}>
-        <input type="checkbox" checked={acceptTerms} onChange={() => setAcceptTerms(!acceptTerms)} />
-        Acepto los términos y condiciones
-      </label>
+        <label className={styles.label}>Contraseña</label>
+        <input name="password" type="password" value={form.password} onChange={handleChange} required className={styles.inputField} />
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>✅ Registro exitoso. Redirigiendo...</p>}
+        <label className={styles.label}>Teléfono</label>
+        <input name="phone" type="tel" value={form.phone} onChange={handleChange} required className={styles.inputField} />
 
-      <button onClick={handleRegister} disabled={loading} style={{ marginTop: '1rem' }}>
-        {loading ? 'Registrando...' : 'Registrarme'}
-      </button>
-    </div>
+        <label className={styles.label}>Dirección</label>
+        <input name="location" value={form.location} onChange={handleChange} required className={styles.inputField} />
+
+        <label className={styles.label}>Categoría</label>
+        <select name="category" value={form.category} onChange={handleChange} required className={styles.inputField}>
+          <option value="">Seleccionar...</option>
+          <option value="electricista">Electricista</option>
+          <option value="plomero">Plomero</option>
+          <option value="gasista">Gasista</option>
+          <option value="albañil">Albañil</option>
+        </select>
+
+        <label className={styles.label}>
+          <input type="checkbox" name="acepta" checked={form.acepta} onChange={handleChange} />{" "}
+          Acepto los <a href="/terminos" target="_blank">Términos y Condiciones</a>
+        </label>
+
+        <button type="submit" className={styles.saveButton} disabled={loading}>
+          {loading ? "Registrando..." : "Registrarme"}
+        </button>
+
+        {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
+        {successMessage && <p style={{ color: "green", marginTop: "1rem" }}>{successMessage}</p>}
+      </form>
+    </main>
   );
 }

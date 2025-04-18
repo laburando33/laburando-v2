@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
   const playerIds = tokens?.map((t) => t.onesignal_id).filter(Boolean);
 
-  if (playerIds.length === 0) {
+  if (!playerIds || playerIds.length === 0) {
     return NextResponse.json({ success: true, info: "No se encontraron destinatarios." });
   }
 

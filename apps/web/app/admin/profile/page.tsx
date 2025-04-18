@@ -1,226 +1,152 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@lib/supabase-web";
-import styles from "../admin.module.css";
-import VerificacionProfesional from "../../../components/profesional/VerificacionProfesional";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../../lib/supabase-web";
+import styles from "./profile.module.css";
 
 export default function ProfilePage() {
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * Componente que muestra el perfil de un profesional.
- * @function ProfilePage
- * @returns {JSX.Element} Componente JSX que muestra el perfil del usuario.
- */
-/*******  c7e17732-40bd-4acc-a26d-4900f3dc1322  *******/  const [profile, setProfile] = useState<any>(null);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [avatarUploading, setAvatarUploading] = useState(false);
-
-  const [formData, setFormData] = useState({
+  const [perfil, setPerfil] = useState<any>(null);
+  const [editando, setEditando] = useState(false);
+  const [form, setForm] = useState({
     full_name: "",
     phone: "",
     location: "",
-    job_description: ""
+    category: "",
   });
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const {
-        data: { user },
-        error: authError
-      } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        console.error("❌ Error autenticación:", authError?.message);
-        setLoading(false);
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session) {
+        router.push("/login");
         return;
       }
+
+      const userId = sessionData.session.user.id;
 
       const { data, error } = await supabase
         .from("professionals")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .maybeSingle();
 
       if (error || !data) {
-        console.error("❌ Error al obtener perfil:", error?.message);
-        setProfile(null);
-      } else {
-        setProfile(data);
-        setFormData({
-          full_name: data.full_name || "",
-          phone: data.phone || "",
-          location: data.location || "",
-          job_description: data.job_description || ""
-        });
+        console.error("❌ Error cargando perfil:", error?.message);
+        router.push("/");
+        return;
       }
 
+      setPerfil(data);
+      setForm({
+        full_name: data.full_name ?? "",
+        phone: data.phone ?? "",
+        location: data.location ?? "",
+        category: data.category ?? "",
+      });
       setLoading(false);
     };
 
     fetchProfile();
-  }, []);
+  }, [router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    if (!profile) return;
-
+  const handleGuardar = async () => {
     const { error } = await supabase
       .from("professionals")
-      .update(formData)
-      .eq("user_id", profile.user_id);
+      .update(form)
+      .eq("user_id", perfil.user_id);
 
     if (error) {
-      console.error("❌ Error al actualizar perfil:", error.message);
-    } else {
-      setProfile({ ...profile, ...formData });
-      setEditing(false);
-    }
-  };
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !profile) return;
-
-    setAvatarUploading(true);
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${profile.user_id}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file, { upsert: true });
-
-    if (uploadError) {
-      console.error("❌ Error subiendo avatar:", uploadError.message);
-      setAvatarUploading(false);
+      alert("❌ Error al guardar: " + error.message);
       return;
     }
 
-    const { data: publicUrl } = supabase.storage
-      .from("avatars")
-      .getPublicUrl(filePath);
-
-    const { error: updateError } = await supabase
-      .from("professionals")
-      .update({ avatar_url: publicUrl.publicUrl })
-      .eq("user_id", profile.user_id);
-
-    if (updateError) {
-      console.error("❌ Error actualizando avatar:", updateError.message);
-    } else {
-      setProfile((prev: any) => ({
-        ...prev,
-        avatar_url: publicUrl.publicUrl
-      }));
-      console.log("✅ Avatar actualizado");
-    }
-
-    setAvatarUploading(false);
+    alert("✅ Cambios guardados.");
+    setEditando(false);
   };
 
   if (loading) return <p className={styles.loading}>Cargando perfil...</p>;
-  if (!profile) return <p className={styles.error}>No se encontró tu perfil.</p>;
 
   return (
     <div className={styles.profileContainer}>
-      <h1 className={styles.title}>👷 Perfil Profesional</h1>
-
-      <div className={styles.avatarSection}>
-        {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt="Avatar" className={styles.avatar} />
-        ) : (
-          <div className={styles.noAvatar}>Sin foto</div>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleAvatarUpload}
-          disabled={avatarUploading}
-          className={styles.fileInput}
-        />
-      </div>
+      <h1 className={styles.title}>👤 Mi Perfil Profesional</h1>
 
       <div className={styles.data}>
-        <p>
-          <strong>Nombre:</strong>{" "}
-          {editing ? (
-            <input
-              name="full_name"
-              value={formData.full_name}
-              onChange={handleChange}
-              className={styles.inputField}
-            />
-          ) : (
-            profile.full_name
-          )}
-        </p>
-        <p>
-          <strong>Teléfono:</strong>{" "}
-          {editing ? (
-            <input
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className={styles.inputField}
-            />
-          ) : (
-            profile.phone || "No especificado"
-          )}
-        </p>
-        <p>
-          <strong>Ubicación:</strong>{" "}
-          {editing ? (
-            <input
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              className={styles.inputField}
-            />
-          ) : (
-            profile.location || "No especificada"
-          )}
-        </p>
-        <p>
-          <strong>Descripción:</strong>{" "}
-          {editing ? (
-            <textarea
-              name="job_description"
-              value={formData.job_description}
-              onChange={handleChange}
-              rows={3}
-              className={styles.textAreaField}
-            />
-          ) : (
-            profile.job_description || "No agregada"
-          )}
-        </p>
+        <label>Nombre completo</label>
+        {editando ? (
+          <input name="full_name" value={form.full_name} onChange={handleChange} />
+        ) : (
+          <p>{perfil.full_name}</p>
+        )}
+
+        <label>Teléfono</label>
+        {editando ? (
+          <input name="phone" value={form.phone} onChange={handleChange} />
+        ) : (
+          <p>{perfil.phone}</p>
+        )}
+
+        <label>Ubicación</label>
+        {editando ? (
+          <input name="location" value={form.location} onChange={handleChange} />
+        ) : (
+          <p>{perfil.location}</p>
+        )}
+
+        <label>Categoría</label>
+        {editando ? (
+          <select name="category" value={form.category} onChange={handleChange}>
+            <option value="">Seleccionar...</option>
+            <option value="electricista">Electricista</option>
+            <option value="Plomería">Plomero</option>
+            <option value="Soldador">Soldador</option>
+            <option value="Albañil">Albañil</option>
+            <option value="Técnico de aire acondicionado">Técnico de aire acondicionado</option>
+            <option value="Tarquino">Tarquino</option>
+            <option value="Durlock">Durlock</option>
+            <option value="Impermeabilización de techos">Impermeabilización de techos</option>
+            <option value="Pulidor de pisos">Pulidor de pisos</option>
+            <option value="Pintor interior">Pintor interior</option>
+            <option value="Pintor de alturas">Pintor de alturas</option>
+            <option value="Vidriería y cerramientos">Vidriería y cerramientos</option>
+            <option value="Colocación de redes de balcones">Colocación de redes de balcones</option>
+            <option value="Mudanza y fletes">Mudanza y fletes</option>
+            <option value="Destapaciones pluviales y cloacales">Destapaciones pluviales y cloacales</option>
+            <option value="Pequeños arreglos">Pequeños arreglos</option>
+
+
+          </select>
+        ) : (
+          <p>{perfil.category}</p>
+        )}
       </div>
 
-      {editing ? (
-        <div className={styles.buttonGroup}>
-          <button onClick={handleSave} className={styles.saveButton}>
-            💾 Guardar
-          </button>
-          <button onClick={() => setEditing(false)} className={styles.cancelButton}>
-            Cancelar
+      <div className={styles.buttonGroup}>
+        {editando ? (
+          <>
+            <button onClick={handleGuardar} className={styles.saveButton}>💾 Guardar</button>
+            <button onClick={() => setEditando(false)} className={styles.cancelButton}>❌ Cancelar</button>
+          </>
+        ) : (
+          <button onClick={() => setEditando(true)} className={styles.editButton}>✏️ Editar Perfil</button>
+        )}
+      </div>
+
+      {!perfil.is_verified && (
+        <div style={{ marginTop: "2rem", textAlign: "center" }}>
+          <p>📤 Aún no estás verificado. Subí tus documentos desde la sección de <strong>verificación</strong>.</p>
+          <button onClick={() => router.push("/admin/verificacion")} className={styles.saveButton}>
+            Verificar mi identidad
           </button>
         </div>
-      ) : (
-        <button onClick={() => setEditing(true)} className={styles.editButton}>
-          ✏️ Modificar
-        </button>
       )}
-
-      <VerificacionProfesional
-        isVerified={!!profile.is_verified}
-        verificationStatus={profile.verificacion_status}
-        userId={profile.user_id}
-      />
     </div>
   );
 }

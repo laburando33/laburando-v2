@@ -1,33 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import styles from "./ProfessionalSidebar.module.css";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase-web";
+import "../app/admin/admin-layout.css"; // asegúrate de tener los estilos ya cargados
 
 export default function ProfessionalSidebar() {
-  const pathname = usePathname();
+  const router = useRouter();
 
-  const handleLogout = () => {
-    alert("Sesión cerrada");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.refresh(); // limpia la sesión del middleware
+    router.replace("/login");
   };
 
   return (
-    <nav className={styles.bottomNav}>
-      <Link href="/admin" className={pathname === "/admin" ? styles.navItemActive : styles.navItem}>
-        📋<span>Solicitudes</span>
-      </Link>
-      <Link href="/admin/profile" className={pathname === "/admin/profile" ? styles.navItemActive : styles.navItem}>
-        👤<span>Perfil</span>
-      </Link>
-      <Link href="/admin/credits" className={pathname === "/admin/credits" ? styles.navItemActive : styles.navItem}>
-        💰<span>Créditos</span>
-      </Link>
-      <Link href="/admin/shop" className={pathname === "/admin/shop" ? styles.navItemActive : styles.navItem}>
-        💡<span>Tienda</span>
-      </Link>
-      <button onClick={handleLogout} className={styles.navItemButton}>
-        🔓<span>Salir</span>
+    <aside className="admin-sidebar">
+      <h2 className="sidebar-title">Mi Panel</h2>
+      <nav>
+        <ul>
+          <li><Link href="/admin/profile">👤 Mi Perfil</Link></li>
+          <li><Link href="/admin">📄 Solicitudes</Link></li>
+          <li><Link href="/admin/shop">🛒 Comprar Créditos</Link></li>
+          <li><Link href="/admin/verificacion">🪪 Verificación</Link></li>
+        </ul>
+      </nav>
+      <button className="logout-button" onClick={handleLogout}>
+        🔓 Cerrar sesión
       </button>
-    </nav>
+    </aside>
   );
 }

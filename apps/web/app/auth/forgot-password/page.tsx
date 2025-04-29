@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase-web";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase-web";
+import styles from "./forgotPassword.module.css";
 
-export default function RecuperarContraseña() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [enviado, setEnviado] = useState(false);
@@ -15,7 +16,7 @@ export default function RecuperarContraseña() {
     setMensaje("⏳ Enviando correo de recuperación...");
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/auth/callback", // ajustá según tu entorno
+      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
     });
 
     if (error) {
@@ -28,35 +29,40 @@ export default function RecuperarContraseña() {
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "400px", margin: "auto" }}>
-      <h2 style={{ textAlign: "center" }}>🔐 Recuperar contraseña</h2>
-      <p style={{ textAlign: "center", fontSize: "0.95rem" }}>
-        Ingresá tu email y te enviaremos un enlace para restablecerla.
+    <main className={styles.main}>
+      <h2 className={styles.title}>🔐 Recuperar Contraseña</h2>
+      <p className={styles.subtitle}>
+        Ingresá tu email para enviarte un enlace de recuperación.
       </p>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <input
+          className={styles.inputField}
           type="email"
           placeholder="Correo electrónico"
-          className="login_input__Y4JR4"
           required
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-
-        <button type="submit" className="saveButton">
+        <button type="submit" className={styles.saveButton}>
           Enviar enlace
         </button>
       </form>
 
-      {mensaje && <p style={{ marginTop: "1rem", textAlign: "center" }}>{mensaje}</p>}
+      {mensaje && <p className={styles.message}>{mensaje}</p>}
 
       {enviado && (
-        <p style={{ textAlign: "center", marginTop: "1rem", fontSize: "0.9rem" }}>
-          ¿No recibiste el correo? <button onClick={() => router.refresh()}>Reenviar</button>
+        <p className={styles.resend}>
+          ¿No recibiste el correo?{" "}
+          <button
+            onClick={() => router.refresh()}
+            className={styles.resendButton}
+          >
+            Reenviar
+          </button>
         </p>
       )}
-    </div>
+    </main>
   );
 }

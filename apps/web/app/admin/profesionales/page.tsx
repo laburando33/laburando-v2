@@ -19,6 +19,8 @@ export default function ProfesionalesAdminPage() {
   const [profesionales, setProfesionales] = useState<Profesional[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null); // 👈
+
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +34,12 @@ export default function ProfesionalesAdminPage() {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (profile?.role !== "admin") return router.push("/unauthorized");
+      if (profile?.role !== "admin") {
+        setHasAccess(false);
+        return;
+      }
+
+      setHasAccess(true);
 
       const { data, error } = await supabase
         .from("view_professionals_with_categories")
@@ -50,18 +57,18 @@ export default function ProfesionalesAdminPage() {
     fetchProfesionales();
   }, [router]);
 
+  if (loading) return <p className={styles.loading}>Cargando profesionales...</p>;
+  if (hasAccess === false) return <p className={styles.error}>🚫 No tenés permiso para ver esta sección.</p>;
+
   const filtered = profesionales.filter((p) =>
     p.full_name.toLowerCase().includes(search.toLowerCase()) ||
     p.email.toLowerCase().includes(search.toLowerCase()) ||
     p.category.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <p className={styles.loading}>Cargando profesionales...</p>;
-
   return (
     <main className={styles.profileContainer}>
       <h1 className={styles.title}>👷 Profesionales Verificados</h1>
-
       <input
         type="text"
         placeholder="Buscar por nombre, email o categoría..."
@@ -69,7 +76,6 @@ export default function ProfesionalesAdminPage() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-
       <div className={styles.cardList}>
         {filtered.map((pro) => (
           <div key={pro.user_id} className={styles.cardItem}>

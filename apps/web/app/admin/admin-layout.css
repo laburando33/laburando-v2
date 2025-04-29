@@ -1,99 +1,26 @@
-/* Sidebar del usuario profesional */
-.admin-sidebar {
-  position: fixed;
-  top: 64px; /* altura del header existente */
-  left: 0;
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebarWrapper {
   width: 250px;
-  height: calc(100vh - 64px); /* ocupa el alto de la pantalla sin pisar el header */
-  background-color: #f8f8f8;
-  padding: 1rem;
-  overflow-y: auto;
-  z-index: 999;
+  background: #ffffff;
   border-right: 1px solid #ddd;
-  margin-top: 30px;
 }
 
-/* Contenido del panel principal */
 .adminContent {
-  flex-grow: 1;
+  flex: 1;
   padding: 2rem;
-  position: relative;
-  z-index: 1;
+  background: #f9f9f9;
 }
 
-/* Estilos para los links */
-.admin-sidebar nav ul {
-  list-style: none;
-  padding: 0;
-}
-
-.admin-sidebar nav ul li {
-  margin: 1rem 0;
-}
-
-.admin-sidebar nav ul li a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
-
-/* Botón de logout */
-.logout-button {
-  display: block;
-  width: 100%;
-  margin-top: 2rem;
-  padding: 0.75rem;
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.logout-button:hover {
-  background-color: #c82333;
-}
-
-/* Título */
-.sidebar-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #888;
-  margin-bottom: 1rem;
-}
 @media (max-width: 768px) {
-  .admin-sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    top: 0;
-    left: 0;
-    margin-top: 0;
-    padding: 1rem;
-    background-color: #f8f8f8;
-    border-right: none;
-    border-bottom: 1px solid #ddd;
-    z-index: 1000;
+  .sidebarWrapper {
+    display: none;
   }
 
-  .admin-content {
-    margin-left: 0;
-    margin-top: 0;
-    padding: 1rem;
-  }
-}
-@media (max-width: 768px) {
-  .admin-sidebar {
-    position: relative;
-    z-index: 10; /* Más bajo */
-  }
-
-  .admin-content {
-    margin-left: 0;
-    margin-top: 64px;
-    padding: 1rem;
-    position: relative;
-    z-index: 1;
+  .adminContent {
+    padding-bottom: 80px;
   }
 }

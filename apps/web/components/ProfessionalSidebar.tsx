@@ -1,33 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaUser, FaCreditCard, FaSignOutAlt, FaBars, FaTimes } from "react-icons/fa"; // ← Agregamos ícono de cerrar
 import { supabase } from "@/lib/supabase-web";
-import "../app/admin/admin-layout.css"; // asegúrate de tener los estilos ya cargados
+import styles from "./ProfessionalSidebar.module.css";
 
 export default function ProfessionalSidebar() {
+  const pathname = usePathname();
   const router = useRouter();
+  const [visible, setVisible] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.refresh(); // limpia la sesión del middleware
-    router.replace("/login");
+    router.push("/login");
   };
 
   return (
-    <aside className="admin-sidebar">
-      <h2 className="sidebar-title">Mi Panel</h2>
-      <nav>
-        <ul>
-          <li><Link href="/admin/profile">👤 Mi Perfil</Link></li>
-          <li><Link href="/admin">📄 Solicitudes</Link></li>
-          <li><Link href="/admin/shop">🛒 Comprar Créditos</Link></li>
-          <li><Link href="/admin/verificacion">🪪 Verificación</Link></li>
+    <>
+      {/* Botón de hamburguesa solo visible en mobile */}
+      <button onClick={() => setVisible(!visible)} className={styles.menuButton}>
+        {visible ? <FaTimes /> : <FaBars />}
+      </button>
+
+      <nav className={`${styles.sidebar} ${visible ? styles.visible : ""}`}>
+        <h2 className={styles.logo}>💼 Profesional</h2>
+        <ul className={styles.navList}>
+          <li className={pathname === "/admin/profile" ? styles.active : ""}>
+            <Link href="/admin/profile" onClick={() => setVisible(false)}>
+              <FaUser /> <span>Mi Perfil</span>
+            </Link>
+          </li>
+          <li className={pathname === "/admin/shop" ? styles.active : ""}>
+            <Link href="/admin/shop" onClick={() => setVisible(false)}>
+              <FaCreditCard /> <span>Comprar Créditos</span>
+            </Link>
+          </li>
+          <li>
+            <button onClick={async () => { await handleLogout(); setVisible(false); }} className={styles.logoutButton}>
+              <FaSignOutAlt /> <span>Salir</span>
+            </button>
+          </li>
         </ul>
       </nav>
-      <button className="logout-button" onClick={handleLogout}>
-        🔓 Cerrar sesión
-      </button>
-    </aside>
+    </>
   );
 }

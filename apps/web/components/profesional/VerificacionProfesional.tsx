@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@lib/supabase-web";
+import { supabase } from "@/lib/supabase-web";
 import styles from "./dashboardVerificacion.module.css";
 import ActualizarVerificacion from "./ActualizarVerificacion";
 
@@ -14,11 +14,9 @@ interface Verificacion {
 
 interface Props {
   userId: string;
-  isVerified?: boolean;
-  verificationStatus?: string;
 }
 
-export default function VerificacionProfesional({ userId, isVerified, verificationStatus }: Props) {
+export default function VerificacionProfesional({ userId }: Props) {
   const [verificacion, setVerificacion] = useState<Verificacion | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,14 +24,14 @@ export default function VerificacionProfesional({ userId, isVerified, verificati
     const loadVerificacion = async () => {
       const { data, error } = await supabase
         .from("verificaciones_profesionales")
-        .select("dni_url, certificado_url, trabajos_urls, estado")
+        .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (error) {
-        console.error("❌ Error al obtener la verificación:", error.message);
+        console.error("❌ Error verificación:", error.message);
         setVerificacion(null);
       } else {
         setVerificacion(data);
@@ -53,10 +51,7 @@ export default function VerificacionProfesional({ userId, isVerified, verificati
 
       {verificacion ? (
         <>
-          <p className={styles.estado}>
-            <strong>Estado:</strong>{" "}
-            {verificacion.estado?.toUpperCase() || verificationStatus?.toUpperCase() || "PENDIENTE"}
-          </p>
+          <p className={styles.estado}><strong>Estado:</strong> {verificacion.estado?.toUpperCase() || "PENDIENTE"}</p>
 
           <div className={styles.docsGrid}>
             <div>
@@ -80,7 +75,7 @@ export default function VerificacionProfesional({ userId, isVerified, verificati
         </>
       ) : (
         <>
-          <p className={styles.estado}>No has enviado ninguna verificación aún.</p>
+          <p className={styles.estado}>Aún no enviaste tu verificación.</p>
           <ActualizarVerificacion userId={userId} />
         </>
       )}

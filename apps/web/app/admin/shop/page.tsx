@@ -2,7 +2,7 @@
 
 import styles from "./shop.module.css";
 import { useEffect, useState } from "react";
-import { supabase } from "@lib/supabase-web";
+import { supabase } from "@/lib/supabase-web";
 import { useRouter } from "next/navigation";
 
 const plans = [
@@ -21,18 +21,16 @@ function formatCurrency(value: number): string {
 
 export default function ShopPage() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [useMock, setUseMock] = useState(false);
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [useMock, setUseMock] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) setUserId(user.id);
-
-      const isMock = process.env.NEXT_PUBLIC_USE_MOCK_PAYMENTS === "true";
-      setUseMock(isMock);
+      setUseMock(process.env.NEXT_PUBLIC_USE_MOCK_PAYMENTS === "true");
     };
     init();
   }, []);
@@ -64,8 +62,7 @@ export default function ShopPage() {
       .maybeSingle();
 
     if (
-      error ||
-      !data ||
+      error || !data ||
       (data.expires_at && new Date(data.expires_at) < new Date()) ||
       (data.max_uses && data.used_count >= data.max_uses)
     ) {
@@ -86,34 +83,21 @@ export default function ShopPage() {
       : plan.price;
 
     if (useMock) {
-      const confirm = window.confirm(
-        `¿Simular la compra de ${plan.credits} créditos por ${formatCurrency(finalPrice)}?`
-      );
+      const confirm = window.confirm(`¿Simular la compra de ${plan.credits} créditos por ${formatCurrency(finalPrice)}?`);
       if (!confirm) return;
 
-      // 1. Agrega créditos
       await fetch("/api/credits/add", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          credits: plan.credits,
-          price: finalPrice,
-          plan_name: plan.name,
-          coupon,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, credits: plan.credits, price: finalPrice, plan_name: plan.name, coupon }),
       });
-      
-      // 2. Consulta datos adicionales para el log de compra
+
       const { data: prof } = await supabase
         .from("professionals")
         .select("full_name, email, phone, category")
         .eq("user_id", userId)
         .maybeSingle();
 
-      // 3. Agrega a historial para administrador
       await supabase.from("credit_purchases").insert({
         user_id: userId,
         credits: plan.credits,
@@ -131,13 +115,7 @@ export default function ShopPage() {
     } else {
       const res = await fetch("/api/payments/create-preference", {
         method: "POST",
-        body: JSON.stringify({
-          title: plan.name,
-          price: finalPrice,
-          credits: plan.credits,
-          userId,
-          coupon,
-        }),
+        body: JSON.stringify({ title: plan.name, price: finalPrice, credits: plan.credits, userId, coupon }),
       });
 
       const { init_point } = await res.json();
@@ -171,15 +149,12 @@ export default function ShopPage() {
 
       <div className={styles.plans}>
         {plans.map((plan) => {
-          const discounted = discount > 0
+          const discountedPrice = discount > 0
             ? Math.round(plan.price * (1 - discount / 100))
             : plan.price;
 
           return (
-            <div
-              key={plan.id}
-              className={`${styles.card} ${plan.recommended ? styles.recommended : ""}`}
-            >
+            <div key={plan.id} className={`${styles.card} ${plan.recommended ? styles.recommended : ""}`}>
               <h2>{plan.name}</h2>
               <p className={styles.price}>
                 {discount > 0 && (
@@ -187,7 +162,7 @@ export default function ShopPage() {
                     {formatCurrency(plan.price)}
                   </span>
                 )}
-                {formatCurrency(discounted)}
+                {formatCurrency(discountedPrice)}
               </p>
               <p>{plan.credits} créditos</p>
               <p>{plan.clients} posibles clientes</p>

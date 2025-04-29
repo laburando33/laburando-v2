@@ -1,52 +1,89 @@
-/* Solo visible en móvil */
-.bottomNav {
-  display: flex;
+.sidebar {
+  background-color: #fff;
+  height: 100vh;
+  width: 260px;
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
-  right: 0;
-  background-color:#fcd93f;
-  border-top: 1px solid #ddd;
-  height: 64px;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 999;
-  padding-bottom: 50px;
-  padding-top: 50px;
+  border-right: 1px solid #ddd;
+  padding: 2rem 1rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 🌟 Agregada una sombra suave */
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
 }
 
-@media (max-width: 768px) {
- 
+.visible {
+  transform: translateX(0);
+}
 
-  .navItem,
-  .navItemActive,
-  .navItemButton {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    color: #fafafa;
-    text-decoration: none;
-    height: 100%;
-    flex: 1;
-    border: none;
-    background: none;
-    cursor: pointer;
+.menuButton {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  padding: 0.6rem 1rem;
+  font-size: 1.4rem;
+  border-radius: 6px;
+  z-index: 1101;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 🌟 Sombra para botón */
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+}
+
+.navList li {
+  margin: 1rem 0;
+}
+
+.navList a,
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.logoutButton {
+  background-color: #d9534f;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  margin-top: 2rem;
+  width: 100%;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.logoutButton:hover {
+  background-color: #c9302c;
+}
+
+.active a {
+  color: #0070f3;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .sidebar {
+    transform: none !important;
+    position: static;
+    width: 260px;
+    height: 100vh;
   }
 
-  .navItemActive {
-    color: black;
-    font-weight: bold;
-  }
-
-  .navItemButton:hover {
-    background-color: #fee;
-  }
-
-  .navItem span,
-  .navItemButton span {
-    font-size: 0.7rem;
-    margin-top: 2px;
+  .menuButton {
+    display: none;
   }
 }

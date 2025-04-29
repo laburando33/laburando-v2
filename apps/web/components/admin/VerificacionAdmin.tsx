@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-web";
-import styles from "../dashboardVerificacion.module.css";
-import VerificacionEstado from "../VerificacionEstado";
+import styles from "../profesional/dashboardVerificacion.module.css";
+import VerificacionEstado from "../profesional/VerificacionEstado";
 
 export default function VerificacionAdmin({ userId }: { userId: string }) {
   const [verificacion, setVerificacion] = useState<any>(null);

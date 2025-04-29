@@ -8,31 +8,54 @@
   font-family: poppins, sans-serif;
   background-color: #f9f9f9;
   color: #333;
+  margin: 20px;
 }
 
 .main {
-  padding: 1.5rem;
-  max-width: 1200px;
+  background: #fff;
   margin: 0 auto;
 }
 
 /* HERO */
 
 .hero {
+  background-image: url('/pintura-amarilla.jpg'); /* ✅ */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 4rem 2rem;
   text-align: center;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-
+.heroImage {
+  width: 85%;
+  max-width: 400px;
+  height: auto;
+  margin-bottom: 1.5rem;
+}
 .heroTitle {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #1a1a1a;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
-
+.heroTitle span {
+  color: #fff;
+  font-weight: 900;
+}
 .heroSubtitle {
-  font-size: 1.2rem;
-  color: #555;
-  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  color: #fff;
+  margin-top: 1.5rem;
+  background-color: #000; 
+  padding: 10px 50px;
+  border-radius: 8px ;
+  font-weight: bold;
+  display: inline-block;
 }
 
 /* Search and Location */
@@ -97,13 +120,16 @@
 }
 
 .sectionTitle {
+  display: inline-block; /* ✅ Hace que el background se ajuste al texto */
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
-  margin-top: 90px;
   font-weight: bold;
-  text-align: center;
+  text-align: center; /* ✅ El texto dentro sigue centrado */
   font-family: poppins, sans-serif;
-
+  background-color: #fcd03f;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  color: #111; /* Opcional: Para mejor contraste sobre amarillo */
 }
 
 .servicesGrid {
@@ -178,7 +204,7 @@
   justify-content: space-between;
   padding: 30px;
   border-radius: 8px;
-  background-color: black;
+  background-color: #fff;
 }
 
 .benefitItem {
@@ -198,7 +224,7 @@
 
 .benefitText {
   font-size: 0.95rem;
-  color: #fff;
+  color: #030303;
 }
 
 /* Formulario y Opiniones */
@@ -371,4 +397,19 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 0.5rem;
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .hero {
+    padding: 6rem 3rem;
+  }
+
+  .heroTitle {
+    font-size: 3rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.5rem;
+  }
 }

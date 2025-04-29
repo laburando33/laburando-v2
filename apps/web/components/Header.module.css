@@ -1,18 +1,17 @@
+/* Header */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  padding: 2.5rem 1rem;        /* Bajamos el padding superior para no duplicar altura */
+  padding: 2.5rem 1rem;
   background-color: #fff;
   border-bottom: 1px solid #ddd;
-  height: 64px;           /* Altura estándar consistente */
+  height: 74px;
 }
 
 .logoContainer {
@@ -20,7 +19,7 @@
   align-items: center;
 }
 
-/* Navegación */
+/* Navigation */
 .nav {
   display: flex;
   gap: 1.5rem;
@@ -46,9 +45,7 @@
   padding: 10px 20px;
   background-color: #fcd93f;
   color: #fff;
-  text-decoration: none;
   border-radius: 8px;
-  
   transition: background-color 0.3s ease;
   font-family: 'Poppins';
 }
@@ -57,64 +54,19 @@
   background-color: black;
 }
 
-/* Ícono del menú móvil */
+/* Mobile Menu Icon */
 .mobileMenuIcon {
   display: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .nav {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-    padding: 1rem 0;
-    z-index: 1000;
-  }
-
-  .nav.navMobileOpen {
-    display: flex;
-  }
-
-  .mobileMenuIcon {
-    display: block;
-  }
-
-  .menuButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #e0a800;
-  }
+.menuButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e0a800;
 }
 
-/* QR Styles — visibles en desktop también */
-.qrContainer {
-  margin: 2rem auto;
-  padding: 1rem;
-  border: 1px solid #ffeeba;
-  background-color: #fff8dc;
-  border-radius: 8px;
-  max-width: 340px;
-  text-align: center;
-}
-
-.qrText {
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
-  color: #555;
-}
-
-.qrHint {
-  font-size: 0.85rem;
-  margin-top: 0.75rem;
-  color: #777;
-}
+/* Modal */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -173,6 +125,8 @@
     opacity: 1;
   }
 }
+
+/* Responsive */
 @media (max-width: 768px) {
   .header {
     padding: 1rem;

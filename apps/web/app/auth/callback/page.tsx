@@ -1,81 +1,63 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase-web";
-import { createProfessionalProfile } from "@/lib/createProfessionalProfile";
+import { useRouter } from "next/navigation";
 import styles from "./callback.module.css";
 
 export default function CallbackPage() {
   const router = useRouter();
-  const [message, setMessage] = useState("⏳ Procesando autenticación...");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [mensaje, setMensaje] = useState("");
 
-  useEffect(() => {
-    const hash = window.location.hash;
-
-    if (hash.includes("type=recovery")) {
-      setMessage("🔁 Redirigiendo para restablecer contraseña...");
-      setTimeout(() => router.replace("/auth/reset-password"), 1000);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setMensaje("❌ Las contraseñas no coinciden.");
       return;
     }
 
-    const handleLogin = async () => {
-      try {
-        await supabase.auth.refreshSession();
+    const { error } = await supabase.auth.updateUser({ password });
 
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        const user = session?.user;
-        if (!user) {
-          setMessage("❌ No se pudo obtener la sesión.");
-          await supabase.auth.signOut();
-          setTimeout(() => router.replace("/login?msg=auth"), 1500);
-          return;
-        }
-
-        // ⚠️ Persistir sesión en cookies
-        await supabase.auth.setSession({
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        });
-
-        // Crear perfil si no existe
-        await createProfessionalProfile(user);
-
-        // Verificar estado
-        const { data: profile, error } = await supabase
-          .from("professionals")
-          .select("is_verified")
-          .eq("user_id", user.id)
-          .single();
-
-        if (error) {
-          console.error("❌ Error al obtener perfil:", error.message);
-          setMessage("❌ Falló al verificar perfil.");
-          return;
-        }
-
-        if (profile?.is_verified) {
-          setMessage("✅ Bienvenido. Redirigiendo al panel...");
-          setTimeout(() => router.replace("/admin/profile"), 1200);
-        } else {
-          setMessage("🕒 Tu cuenta está en revisión.");
-          setTimeout(() => router.replace("/verificacion-pendiente"), 1500);
-        }
-      } catch (err) {
-        console.error("Callback error:", err);
-        setMessage("❌ Error en el login.");
-        setTimeout(() => router.replace("/login?msg=error"), 2000);
-      }
-    };
-
-    handleLogin();
-  }, [router]);
+    if (error) {
+      console.error("❌ Error:", error.message);
+      setMensaje("❌ Error al actualizar la contraseña.");
+    } else {
+      setMensaje("✅ Contraseña actualizada. ¡Ahora podés ingresar!");
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    }
+  };
 
   return (
-    <div className={styles.callbackContainer}>
-      <div className={styles.message}>{message}</div>
-    </div>
+    <main className={styles.main}>
+      <h2 className={styles.title}>🔑 Nueva Contraseña</h2>
+
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <input
+          className={styles.inputField}
+          type="password"
+          placeholder="Nueva contraseña"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <input
+          className={styles.inputField}
+          type="password"
+          placeholder="Confirmar nueva contraseña"
+          required
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+        <button type="submit" className={styles.saveButton}>
+          Cambiar contraseña
+        </button>
+      </form>
+
+      {mensaje && <p className={styles.message}>{mensaje}</p>}
+    </main>
   );
 }

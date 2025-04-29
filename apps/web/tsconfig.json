@@ -17,6 +17,8 @@
       "@repo/ui": [
         "./components/Header"
       ], 
+      "@/components/*": ["./components/*"],
+
       "@lib/*": ["lib/*"]
 
     },

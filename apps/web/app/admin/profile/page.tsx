@@ -2,40 +2,52 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../../lib/supabase-web";
+import { supabase } from "@/lib/supabase-web";
 import styles from "./profile.module.css";
+import AvatarUploader from "@/components/profesional/AvatarUploader";
+import VerificacionProfesional from "@/components/profesional/VerificacionProfesional";
+import { DashboardPro } from "@/components/profesional/DashboardPro.module.css";
+
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * ProfilePage is a React component that displays and manages the user's profile.
+ * It allows the user to view and edit their profile information, such as full name,
+ * phone number, location, and category. The component also provides an avatar uploader
+ * and a verification status section.
+ * 
+ * - Fetches the user's profile data on component mount.
+ * - Allows editing of profile information with save and cancel options.
+ * - Redirects to login if user is not authenticated.
+ * - Displays loading and error states appropriately.
+ */
+
+/*******  8608821f-d211-4e1c-92e0-dc6dd8b7f4a2  *******/
+
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [perfil, setPerfil] = useState<any>(null);
+  const [form, setForm] = useState({ full_name: "", phone: "", location: "", category: "" });
   const [editando, setEditando] = useState(false);
-  const [form, setForm] = useState({
-    full_name: "",
-    phone: "",
-    location: "",
-    category: "",
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session) {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
         router.push("/login");
         return;
       }
 
-      const userId = sessionData.session.user.id;
-
       const { data, error } = await supabase
         .from("professionals")
         .select("*")
-        .eq("user_id", userId)
-        .maybeSingle();
+        .eq("user_id", user.id)
+        .single();
 
       if (error || !data) {
-        console.error("❌ Error cargando perfil:", error?.message);
-        router.push("/");
+        setError("❌ No se pudo cargar tu perfil.");
         return;
       }
 
@@ -50,11 +62,10 @@ export default function ProfilePage() {
     };
 
     fetchProfile();
-  }, [router]);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleGuardar = async () => {
@@ -68,17 +79,22 @@ export default function ProfilePage() {
       return;
     }
 
-    alert("✅ Cambios guardados.");
+    alert("✅ Cambios guardados correctamente.");
     setEditando(false);
   };
 
-  if (loading) return <p className={styles.loading}>Cargando perfil...</p>;
+  if (loading) return <p className={styles.loading}>🔄 Cargando perfil...</p>;
+  if (error || !perfil) return <div className={styles.errorBox}><p>{error}</p></div>;
+
+  const firstName = perfil.full_name?.split(" ")[0] || "Profesional";
 
   return (
     <div className={styles.profileContainer}>
-      <h1 className={styles.title}>👤 Mi Perfil Profesional</h1>
+      <h1 className={styles.title}>👋 ¡Hola, {firstName}!</h1>
 
-      <div className={styles.data}>
+      <AvatarUploader userId={perfil.user_id} avatarUrl={perfil.avatar_url} />
+
+      <div className={styles.dataSection}>
         <label>Nombre completo</label>
         {editando ? (
           <input name="full_name" value={form.full_name} onChange={handleChange} />
@@ -102,27 +118,7 @@ export default function ProfilePage() {
 
         <label>Categoría</label>
         {editando ? (
-          <select name="category" value={form.category} onChange={handleChange}>
-            <option value="">Seleccionar...</option>
-            <option value="electricista">Electricista</option>
-            <option value="Plomería">Plomero</option>
-            <option value="Soldador">Soldador</option>
-            <option value="Albañil">Albañil</option>
-            <option value="Técnico de aire acondicionado">Técnico de aire acondicionado</option>
-            <option value="Tarquino">Tarquino</option>
-            <option value="Durlock">Durlock</option>
-            <option value="Impermeabilización de techos">Impermeabilización de techos</option>
-            <option value="Pulidor de pisos">Pulidor de pisos</option>
-            <option value="Pintor interior">Pintor interior</option>
-            <option value="Pintor de alturas">Pintor de alturas</option>
-            <option value="Vidriería y cerramientos">Vidriería y cerramientos</option>
-            <option value="Colocación de redes de balcones">Colocación de redes de balcones</option>
-            <option value="Mudanza y fletes">Mudanza y fletes</option>
-            <option value="Destapaciones pluviales y cloacales">Destapaciones pluviales y cloacales</option>
-            <option value="Pequeños arreglos">Pequeños arreglos</option>
-
-
-          </select>
+          <input name="category" value={form.category} onChange={handleChange} />
         ) : (
           <p>{perfil.category}</p>
         )}
@@ -139,14 +135,11 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {!perfil.is_verified && (
-        <div style={{ marginTop: "2rem", textAlign: "center" }}>
-          <p>📤 Aún no estás verificado. Subí tus documentos desde la sección de <strong>verificación</strong>.</p>
-          <button onClick={() => router.push("/admin/verificacion")} className={styles.saveButton}>
-            Verificar mi identidad
-          </button>
-        </div>
-      )}
+      <VerificacionProfesional
+        userId={perfil.user_id}
+        isVerified={perfil.is_verified}
+        verificationStatus={perfil.verificacion_status}
+      />
     </div>
   );
 }
